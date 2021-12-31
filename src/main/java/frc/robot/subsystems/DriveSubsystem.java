@@ -46,25 +46,28 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Instantiate the NavX
     navX = new AHRS(SPI.Port.kMXP);
+
+    // Instantiate the differential drive
+    differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
   }
 
   /**
-   * Set the power of the drivetrain
-   * @param power
+   * Set the speed of the drivetrain
+   * @param speed
    */
-  public void setPower(double power) {
-    leftDrive.set(power);
-    rightDrive.set(power);
+  public void setSpeed(double speed) {
+    leftDrive.set(speed);
+    rightDrive.stopMotor();
   }
 
   /**
    * Set the power of the left and right sides of the drivetrain independently
-   * @param leftPower
-   * @param rightPower
+   * @param leftSpeed
+   * @param rightSpeed
    */
-  public void setPower(double leftPower, double rightPower) {
-    leftDrive.set(leftPower);
-    rightDrive.set(rightPower);
+  public void setSpeed(double leftSpeed, double rightSpeed) {
+    leftDrive.set(leftSpeed);
+    rightDrive.set(rightSpeed);
   }
 
   /**

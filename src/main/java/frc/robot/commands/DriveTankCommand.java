@@ -11,14 +11,14 @@ import frc.robot.subsystems.DriveSubsystem;
 
 public class DriveTankCommand extends CommandBase {
 
-  DoubleSupplier leftPower;
-  DoubleSupplier rightPower;
+  DoubleSupplier leftSpeed;
+  DoubleSupplier rightSpeed;
   DriveSubsystem drivetrain;
 
   /** Creates a new DriveTank. */
-  public DriveTankCommand(DoubleSupplier leftPower, DoubleSupplier rightPower, DriveSubsystem drivetrain) {
-    this.leftPower = leftPower;
-    this.rightPower = rightPower;
+  public DriveTankCommand(DoubleSupplier leftSpeed, DoubleSupplier rightSpeed, DriveSubsystem drivetrain) {
+    this.leftSpeed = leftSpeed;
+    this.rightSpeed = rightSpeed;
     this.drivetrain = drivetrain;
     addRequirements(drivetrain);
   }
@@ -30,7 +30,7 @@ public class DriveTankCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drivetrain.setPower(leftPower.getAsDouble(), rightPower.getAsDouble());
+    drivetrain.setSpeed(leftSpeed.getAsDouble(), rightSpeed.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
