@@ -9,7 +9,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.DriveTank;
+import frc.robot.commands.DriveTankCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
 /**
@@ -31,7 +31,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     // Set and start the default drive command
-    drivetrain.setDefaultCommand(new DriveTank(
+    drivetrain.setDefaultCommand(new DriveTankCommand(
       () -> driverController.getLeftY(),
       () -> driverController.getRightY(),
        drivetrain));

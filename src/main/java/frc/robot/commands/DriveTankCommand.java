@@ -9,14 +9,14 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class DriveTank extends CommandBase {
+public class DriveTankCommand extends CommandBase {
 
   DoubleSupplier leftPower;
   DoubleSupplier rightPower;
   DriveSubsystem drivetrain;
 
   /** Creates a new DriveTank. */
-  public DriveTank(DoubleSupplier leftPower, DoubleSupplier rightPower, DriveSubsystem drivetrain) {
+  public DriveTankCommand(DoubleSupplier leftPower, DoubleSupplier rightPower, DriveSubsystem drivetrain) {
     this.leftPower = leftPower;
     this.rightPower = rightPower;
     this.drivetrain = drivetrain;
