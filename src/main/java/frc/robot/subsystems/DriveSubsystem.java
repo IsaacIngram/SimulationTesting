@@ -56,8 +56,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param speed
    */
   public void setSpeed(double speed) {
-    leftDrive.set(speed);
-    rightDrive.stopMotor();
+    differentialDrive.tankDrive(speed, speed);
   }
 
   /**
@@ -66,16 +65,14 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rightSpeed
    */
   public void setSpeed(double leftSpeed, double rightSpeed) {
-    leftDrive.set(leftSpeed);
-    rightDrive.set(rightSpeed);
+    differentialDrive.tankDrive(leftSpeed, rightSpeed);
   }
 
   /**
    * Stop the drive motors
    */
   public void stopMotors() {
-    leftDrive.set(0);
-    rightDrive.set(0);
+    differentialDrive.tankDrive(0, 0);
   }
 
   /**
