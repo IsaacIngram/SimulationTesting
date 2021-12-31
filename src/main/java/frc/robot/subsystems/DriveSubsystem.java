@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.SPI;
 
-public class Drivetrain extends SubsystemBase {
+public class DriveSubsystem extends SubsystemBase {
 
   DifferentialDrive differentialDrive;
   CANSparkMax frontLeftSparkMax;
@@ -26,7 +26,7 @@ public class Drivetrain extends SubsystemBase {
   
 
   /** Creates a new Drivetrain. */
-  public Drivetrain() {
+  public DriveSubsystem() {
 
     // Instantiate our motor controllers for the drivetrain
     frontLeftSparkMax = new CANSparkMax(0, MotorType.kBrushless);
