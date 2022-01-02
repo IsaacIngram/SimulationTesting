@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotGearing;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotMotor;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotWheelSize;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
@@ -80,7 +81,7 @@ public class DriveSubsystem extends SubsystemBase {
     // Instantiate robot navigation components
     odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getOrientation()));
     field2d = new Field2d();
-
+    SmartDashboard.putData("Field", field2d);
   }
 
   /**
