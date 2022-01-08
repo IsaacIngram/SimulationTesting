@@ -76,21 +76,25 @@ public class RobotContainer {
     var autoVoltageConstraint = new DifferentialDriveVoltageConstraint(new SimpleMotorFeedforward(ConstantsPW.ksVolts, ConstantsPW.kvVoltSecondsPerMeter, ConstantsPW.kaVoltSecondsSquaredPerMeter), ConstantsPW.kDriveKinematics, 10);
     
     // Create trajector configuration based on the above voltage constraint
-    TrajectoryConfig config = new TrajectoryConfig(ConstantsPW.kMaxSpeedMetersPerSecond, ConstantsPW.kMaxAccelerationMetersPerSecondSquared)
+    TrajectoryConfig config = new TrajectoryConfig(
+      ConstantsPW.kMaxSpeedMetersPerSecond, 
+      ConstantsPW.kMaxAccelerationMetersPerSecondSquared)
     .setKinematics(ConstantsPW.kDriveKinematics)
     .addConstraint(autoVoltageConstraint);
 
     // Generate a trajectory to follow
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
       // Start at the origin facing the +x direction
-      new Pose2d(0, 0, new Rotation2d(0)),
+      new Pose2d(2.981, 7.184, new Rotation2d(0)),
       List.of(
-        new Translation2d(1, 1),
-        new Translation2d(2, -1)
+        new Translation2d(6.825, 4.847),
+        new Translation2d(11.901, 7.310)
       ),
-      new Pose2d(3, 0, new Rotation2d(0)),
+      new Pose2d(14.288, 4.194, new Rotation2d(0)),
       config
     );
+
+    drivetrain.setPose(exampleTrajectory.getInitialPose());;
 
     // Generate a command based on our trajectory
     RamseteCommand ramseteCommand = new RamseteCommand(

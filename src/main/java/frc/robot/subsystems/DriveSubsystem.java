@@ -248,10 +248,10 @@ public class DriveSubsystem extends SubsystemBase {
     setSimDoubleFromDeviceData("SPARK MAX [3]", "Position", driveSim.getRightPositionMeters());
 
     // Update the Spark Max applied outputs
-    setSimDoubleFromDeviceData("SPARK MAX [0]", "Applied Output", leftDrive.get());
-    setSimDoubleFromDeviceData("SPARK MAX [1]", "Applied Output", leftDrive.get());
-    setSimDoubleFromDeviceData("SPARK MAX [2]", "Applied Output", rightDrive.get());
-    setSimDoubleFromDeviceData("SPARK MAX [3]", "Applied Output", rightDrive.get());
+    setSimDoubleFromDeviceData("SPARK MAX [0]", "Applied Output", voltsSuppliedLeft);
+    setSimDoubleFromDeviceData("SPARK MAX [1]", "Applied Output", voltsSuppliedLeft);
+    setSimDoubleFromDeviceData("SPARK MAX [2]", "Applied Output", voltsSuppliedRight);
+    setSimDoubleFromDeviceData("SPARK MAX [3]", "Applied Output", voltsSuppliedRight);
   }
 
   /**
