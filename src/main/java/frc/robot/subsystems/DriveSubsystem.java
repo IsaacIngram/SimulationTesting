@@ -18,10 +18,14 @@ import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotWheelSiz
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.ConstantsPW;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
 
@@ -34,15 +38,15 @@ public class DriveSubsystem extends SubsystemBase {
   CANSparkMax rearRightSparkMax;
   MotorControllerGroup leftDrive;
   MotorControllerGroup rightDrive;
-  RelativeEncoder frontLeftEncoder;
-  RelativeEncoder frontRightEncoder;
-  RelativeEncoder rearLeftEncoder;
-  RelativeEncoder rearRightEncoder;
+  RelativeEncoder leftEncoder;
+  RelativeEncoder rightEncoder;
   AHRS navX;
   DifferentialDrivetrainSim driveSim;
   DifferentialDriveOdometry odometry;
   Field2d field2d;
-  
+
+  double voltsSuppliedLeft = 0;
+  double voltsSuppliedRight = 0;
 
   /** Creates a new Drivetrain. */
   public DriveSubsystem() {
@@ -64,10 +68,12 @@ public class DriveSubsystem extends SubsystemBase {
     rightDrive = new MotorControllerGroup(rearLeftSparkMax, rearRightSparkMax);
 
     // Instantiate our encoders
-    frontLeftEncoder = frontLeftSparkMax.getEncoder();
-    frontRightEncoder = frontRightSparkMax.getEncoder();
-    rearLeftEncoder = rearLeftSparkMax.getEncoder();
-    rearRightEncoder = rearRightSparkMax.getEncoder();
+    leftEncoder = frontLeftSparkMax.getEncoder();
+    rightEncoder = frontRightSparkMax.getEncoder();
+
+    // Set our encoder's distance per pulse
+    leftEncoder.setPositionConversionFactor(Constants.driveEncConversionFactor);
+    rightEncoder.setPositionConversionFactor(Constants.driveEncConversionFactor);
 
     // Instantiate the NavX
     navX = new AHRS(SPI.Port.kMXP);
@@ -113,7 +119,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return
    */
   public double getLeftPosition() {
-    return (frontLeftEncoder.getPosition()+rearLeftEncoder.getPosition())/2;
+    return leftEncoder.getPosition();
   }
 
   /**
@@ -121,7 +127,15 @@ public class DriveSubsystem extends SubsystemBase {
    * @return
    */
   public double getRightPosition() {
-    return (frontRightEncoder.getPosition()+rearRightEncoder.getPosition())/2;
+    return rightEncoder.getPosition();
+  }
+
+  /**
+   * Return the current wheel speeds of the robot
+   * @return
+   */
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+    return new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(), rightEncoder.getVelocity());
   }
 
   /**
@@ -139,6 +153,27 @@ public class DriveSubsystem extends SubsystemBase {
     navX.reset();
   }
 
+  /**
+   * Return the current pose of the robot
+   * @return
+   */
+  public Pose2d getPose() {
+    return odometry.getPoseMeters();
+  }
+
+  /**
+   * Drive the robot using volts
+   * @param leftVolts The volts for the left side of the robot
+   * @param rightVolts The volts for the right side of the robot
+   */
+  public void setVolts(double leftVolts, double rightVolts) {
+    leftDrive.setVoltage(leftVolts);
+    rightDrive.setVoltage(rightVolts);
+    voltsSuppliedLeft = leftVolts;
+    voltsSuppliedRight = rightVolts;
+    differentialDrive.feed();
+  }
+
   @Override
   public void periodic() {
 
@@ -154,8 +189,9 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Set the inputs to the drivesim based on the current robot voltage
     // Note: The motor controllers give us a negative output value because they are inverted, so we have to invert that value.
-    driveSim.setInputs(-leftDrive.get()*RobotController.getInputVoltage(), -rightDrive.get()*RobotController.getInputVoltage());
+    //driveSim.setInputs(-leftDrive.get()*RobotController.getInputVoltage(), -rightDrive.get()*RobotController.getInputVoltage());
 
+    driveSim.setInputs(voltsSuppliedLeft, voltsSuppliedRight);
     driveSim.update(0.02);
 
     // Update the NavX data

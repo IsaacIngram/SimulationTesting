@@ -7,8 +7,22 @@
 
 package frc.robot;
 
+import java.util.List;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.commands.DriveTankCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -56,7 +70,42 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  // public Command getAutonomousCommand() {
+  public Command getAutonomousCommand() {
 
-  // }
+    // Create voltage constraint
+    var autoVoltageConstraint = new DifferentialDriveVoltageConstraint(new SimpleMotorFeedforward(ConstantsPW.ksVolts, ConstantsPW.kvVoltSecondsPerMeter, ConstantsPW.kaVoltSecondsSquaredPerMeter), ConstantsPW.kDriveKinematics, 10);
+    
+    // Create trajector configuration based on the above voltage constraint
+    TrajectoryConfig config = new TrajectoryConfig(ConstantsPW.kMaxSpeedMetersPerSecond, ConstantsPW.kMaxAccelerationMetersPerSecondSquared)
+    .setKinematics(ConstantsPW.kDriveKinematics)
+    .addConstraint(autoVoltageConstraint);
+
+    // Generate a trajectory to follow
+    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+      // Start at the origin facing the +x direction
+      new Pose2d(0, 0, new Rotation2d(0)),
+      List.of(
+        new Translation2d(1, 1),
+        new Translation2d(2, -1)
+      ),
+      new Pose2d(3, 0, new Rotation2d(0)),
+      config
+    );
+
+    RamseteCommand ramseteCommand = new RamseteCommand(
+      exampleTrajectory,
+      drivetrain::getPose,
+      new RamseteController(ConstantsPW.kRamseteB, ConstantsPW.kRamseteZeta),
+      new SimpleMotorFeedforward(ConstantsPW.ksVolts, ConstantsPW.kvVoltSecondsPerMeter, ConstantsPW.kaVoltSecondsSquaredPerMeter),
+      ConstantsPW.kDriveKinematics,
+      drivetrain::getWheelSpeeds,
+      new PIDController(ConstantsPW.kPDriveVel, 0, 0),
+      new PIDController(ConstantsPW.kPDriveVel, 0,0),
+      drivetrain::setVolts,
+      drivetrain
+    );
+
+    return ramseteCommand;
+
+  }
 }

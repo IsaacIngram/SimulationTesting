@@ -5,6 +5,21 @@
         "header": {
           "open": true
         }
+      },
+      "SPARK MAX [1]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [2]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [3]": {
+        "header": {
+          "open": true
+        }
       }
     }
   },
@@ -19,11 +34,15 @@
     },
     "windows": {
       "/SmartDashboard/Field": {
-        "image": "/Users/isaacingram/Desktop/2020-field.png",
         "window": {
           "visible": true
         }
       }
+    }
+  },
+  "NetworkTables": {
+    "FMSInfo": {
+      "open": true
     }
   },
   "Plot": {
