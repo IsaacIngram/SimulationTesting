@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.ConstantsPW;
+import frc.robot.Robot;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -57,11 +58,22 @@ public class DriveSubsystem extends SubsystemBase {
     rearLeftSparkMax = new CANSparkMax(2, MotorType.kBrushless);
     rearRightSparkMax = new CANSparkMax(3, MotorType.kBrushless);
 
-    // Invert the spark maxes
-    frontLeftSparkMax.setInverted(true);
-    frontRightSparkMax.setInverted(true);
-    rearLeftSparkMax.setInverted(true);
-    rearRightSparkMax.setInverted(true);
+    if(Robot.isSimulation()) {
+      // Invert the spark maxes for the simulation
+      frontLeftSparkMax.setInverted(true);
+      frontRightSparkMax.setInverted(true);
+      rearLeftSparkMax.setInverted(true);
+      rearRightSparkMax.setInverted(true);
+
+      // Instantiate simulation components
+      driveSim = DifferentialDrivetrainSim.createKitbotSim(KitbotMotor.kDoubleNEOPerSide, KitbotGearing.k10p71, KitbotWheelSize.kSixInch, null);
+    } else {
+      // Invert the spark maxes for the real robot
+      frontLeftSparkMax.setInverted(true);
+      frontRightSparkMax.setInverted(true);
+      rearLeftSparkMax.setInverted(true);
+      rearRightSparkMax.setInverted(true);
+    }
 
     // Instantiate our two motor controller groups
     leftDrive = new MotorControllerGroup(frontLeftSparkMax, frontRightSparkMax);
@@ -80,9 +92,6 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Instantiate the differential drive
     differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
-
-    // Instantiate simulation components
-    driveSim = DifferentialDrivetrainSim.createKitbotSim(KitbotMotor.kDoubleNEOPerSide, KitbotGearing.k10p71, KitbotWheelSize.kSixInch, null);
     
     // Instantiate robot navigation components
     odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getOrientation()));
@@ -112,6 +121,8 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void stopMotors() {
     differentialDrive.tankDrive(0, 0);
+    voltsSuppliedLeft = 0;
+    voltsSuppliedRight = 0;
   }
 
   /**
@@ -151,6 +162,26 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void resetNavX() {
     navX.reset();
+
+    if(Robot.isSimulation()) {
+      setSimDoubleFromDeviceData("navX-Sensor[0]", "Yaw", 0);
+    }
+  }
+
+  /**
+   * Reset the encoders
+   */
+  public void resetEncoders() {
+    leftEncoder.setPosition(0);
+    rightEncoder.setPosition(0);
+
+    if(Robot.isSimulation()) {
+      // Update the Spark Max positions for the simulation
+      setSimDoubleFromDeviceData("SPARK MAX [0]", "Position", 0);
+      setSimDoubleFromDeviceData("SPARK MAX [1]", "Position", 0);
+      setSimDoubleFromDeviceData("SPARK MAX [2]", "Position", 0);
+      setSimDoubleFromDeviceData("SPARK MAX [3]", "Position", 0);
+    }
   }
 
   /**
@@ -162,13 +193,26 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
+   * Set the robot's current Pose
+   * @param newPose
+   */
+  public void setPose(Pose2d newPose) {
+    resetEncoders();
+    odometry.resetPosition(newPose, Rotation2d.fromDegrees(getOrientation()));
+
+    if(Robot.isSimulation()) {
+      driveSim.setPose(newPose);
+    }
+  }
+
+  /**
    * Drive the robot using volts
    * @param leftVolts The volts for the left side of the robot
    * @param rightVolts The volts for the right side of the robot
    */
   public void setVolts(double leftVolts, double rightVolts) {
     leftDrive.setVoltage(leftVolts);
-    rightDrive.setVoltage(rightVolts);
+    rightDrive.setVoltage(-rightVolts);
     voltsSuppliedLeft = leftVolts;
     voltsSuppliedRight = rightVolts;
     differentialDrive.feed();

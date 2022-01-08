@@ -92,6 +92,7 @@ public class RobotContainer {
       config
     );
 
+    // Generate a command based on our trajectory
     RamseteCommand ramseteCommand = new RamseteCommand(
       exampleTrajectory,
       drivetrain::getPose,

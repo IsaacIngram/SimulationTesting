@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -30,7 +31,7 @@ public class DriveTankCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drivetrain.setSpeed(leftSpeed.getAsDouble(), rightSpeed.getAsDouble());
+    drivetrain.setVolts(leftSpeed.getAsDouble()*12, rightSpeed.getAsDouble()*12);
   }
 
   // Called once the command ends or is interrupted.
